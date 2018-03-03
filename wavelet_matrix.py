@@ -1,24 +1,26 @@
-class WaveMatrix:
-    def __init__(self):
-        self.th_list = [None] # add dummy to first
+class WaveletMatrix:
+    def __init__(self, data=None):
+        self.th_list = [None] # no threshold at first row
+        if data:
+            self.data = self.get_data(data)
 
-    def get_data(self, data):
-        self._data = data # debug
-        max_v = max(data)
-        bin_size = len(bin(max_v)) - 2 # 0b111
-        self.bin_size = bin_size
-        self.fmt = '{0:0' + str(bin_size) + 'b}'
+    def get_data(self, data=None):
+        if data is None:
+            return self.data
+
+        self.bin_size = len(bin(max(data))) - 2 # ignore '0b' prefix, e.g., 0b111
+        self.fmt = '{0:0' + str(self.bin_size) + 'b}'
 
         bin_data = [self.fmt.format(d) for d in data]
         bin_data_list = []
         wav_mat = []
 
-        for i in range(bin_size):
+        for i in range(self.bin_size):
             bin_data_list.append([int(b[i]) for b in bin_data])
 
         wav_mat.append(bin_data_list[0])
         indices = range(len(data))
-        for i in range(0, bin_size - 1):
+        for i in range(0, self.bin_size - 1):
             pfx_ind, sfx_ind = [], []
             pfx, sfx = [], []
             for c, b in enumerate(wav_mat[i]):
@@ -49,9 +51,7 @@ class WaveMatrix:
                 idx = d[i][:idx].count(b)
                 if b == 1:
                     idx += self.th_list[i + 1]
-        # print('mem', mem)
         ans = int(''.join([str(b) for b in mem]), 2)
-        # print('ans', ans)
         return ans
 
     def rank(self, n, index):
@@ -64,7 +64,6 @@ class WaveMatrix:
         for i in range(self.bin_size):
             v = int(n_b[i])
             ct = d[i][beg:end].count(v)
-            print('ct', ct)
             if i < self.bin_size - 1: # update idx
                 if v == 0:
                     beg = 0
