@@ -1,5 +1,7 @@
 # wavlet-matrix
 
+This is a simple example of the Wavelet Matrix in Python.
+
 ## How to Use
 ```
 $ python main.py
